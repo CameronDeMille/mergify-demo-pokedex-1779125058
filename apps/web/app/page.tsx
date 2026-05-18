@@ -1,4 +1,5 @@
 import { loadPokemon } from "./lib/pokemon";
+import { FavoriteButton } from "./components/FavoriteButton";
 
 type SearchParams = { page?: string; pageSize?: string };
 
@@ -20,13 +21,17 @@ export default function Page({
   const items = all.slice(start, start + pageSize);
   const hasNext = start + pageSize < all.length;
 
+  const token = process.env.NEXT_PUBLIC_DEMO_TOKEN ?? "demo-user";
+  const apiBase = process.env.NEXT_PUBLIC_API_BASE ?? "";
+
   return (
     <main>
       <h1>Pokedex</h1>
       <ul>
         {items.map((p) => (
           <li key={p.id}>
-            #{p.id} {p.name} — {p.types.join(", ")}
+            #{p.id} {p.name} — {p.types.join(", ")}{" "}
+            <FavoriteButton pokemonId={p.id} token={token} apiBase={apiBase} />
           </li>
         ))}
       </ul>
