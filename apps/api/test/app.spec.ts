@@ -8,11 +8,28 @@ describe("api", () => {
     expect(await res.json()).toEqual({ ok: true });
   });
 
-  it("GET /pokemon returns a non-empty array", async () => {
+  it("GET /pokemon returns a paginated page", async () => {
+    const res = await app.request("/pokemon?page=1&pageSize=3");
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as {
+      items: unknown[];
+      page: number;
+      pageSize: number;
+      total: number;
+      hasNext: boolean;
+    };
+    expect(body.page).toBe(1);
+    expect(body.pageSize).toBe(3);
+    expect(body.items.length).toBe(3);
+    expect(body.total).toBeGreaterThan(0);
+    expect(body.hasNext).toBe(true);
+  });
+
+  it("GET /pokemon defaults page and pageSize", async () => {
     const res = await app.request("/pokemon");
     expect(res.status).toBe(200);
-    const body = await res.json();
-    expect(Array.isArray(body)).toBe(true);
-    expect(body.length).toBeGreaterThan(0);
+    const body = (await res.json()) as { page: number; pageSize: number };
+    expect(body.page).toBe(1);
+    expect(body.pageSize).toBe(20);
   });
 });
